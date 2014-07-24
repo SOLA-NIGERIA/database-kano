@@ -44,7 +44,7 @@ update system.config_map_layer_metadata set  value = 'false' where "name" = 'in-
 
 
 
-
+DROP VIEW application.systematic_registration_certificates;
 CREATE OR REPLACE VIEW application.systematic_registration_certificates AS 
  SELECT DISTINCT 
  aa.nr, 
