@@ -1,6 +1,4 @@
-﻿DROP FUNCTION administrative.get_parcel_share(character varying);
-
-CREATE OR REPLACE FUNCTION administrative.get_parcel_share(baunit_id character varying)
+﻿CREATE OR REPLACE FUNCTION administrative.get_parcel_share(baunit_id character varying)
   RETURNS character varying AS
 $BODY$
 declare
