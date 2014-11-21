@@ -99,6 +99,12 @@ name = 'KN/FGE/A',
 id = 'Kano/Nassaraw/Fagge A'
 WHERE ID = 'Kano/Nassaraw/Fagge 3';
 
+
+UPDATE cadastre.spatial_unit_group 
+SET label = replace(label, 'Nassaraw','Fagge'),
+name = replace(name, 'Nassaraw','Fagge'),
+id = replace(id, 'Nassaraw','Fagge');
+
 ----------- SPATIAL_UNIT_GROUP_IN TABLE POPULATION ----------------------------------------
 
 DELETE FROM cadastre.spatial_unit_in_group;
