@@ -1,3 +1,53 @@
+CREATE OR REPLACE FUNCTION cadastre.get_new_cadastre_object_identifier_last_part(geom geometry, cadastre_object_type character varying)
+  RETURNS character varying AS
+$BODY$
+declare
+last_part geometry;
+val_to_return character varying;
+srid_found integer;
+begin
+ 
+ 
+  srid_found = (select srid from system.crs);
+  
+
+   last_part := ST_SetSRID(geom,srid_found);
+ 
+ if cadastre_object_type = 'mapped_geometry' then   
+   select name 
+   into val_to_return
+   from cadastre.spatial_unit_group sg
+   where ST_Intersects(ST_PointOnSurface(last_part), sg.geom)
+   and sg.hierarchy_level = 3;
+ else
+   select name into val_to_return
+   from cadastre.spatial_unit_group sg
+   where 
+   ST_Intersects(ST_PointOnSurface(
+   ST_Transform(
+   ST_GeomFromText(
+   ST_AsText(last_part),4326),32632)), sg.geom)
+   and 
+   sg.hierarchy_level = 3
+   ;
+ end if;
+
+   if val_to_return is null then
+    val_to_return := 'NO LGA/WARD';
+   end if;
+
+  return val_to_return;
+end;
+$BODY$
+  LANGUAGE plpgsql VOLATILE
+  COST 100;
+ALTER FUNCTION cadastre.get_new_cadastre_object_identifier_last_part(geometry, character varying)
+  OWNER TO postgres;
+COMMENT ON FUNCTION cadastre.get_new_cadastre_object_identifier_last_part(geometry, character varying) IS 'This function generates the last part of the cadastre object identifier.
+It has to be overridden to apply the algorithm specific to the situation.';
+
+
+
 
 INSERT INTO source.administrative_source_type(
             code, display_value, status, description, is_for_registration)
@@ -7,11 +57,11 @@ INSERT INTO source.administrative_source_type(
 --INSERT INTO application.request_type_requires_source_type(
   --          source_type_code, request_type_code)
     --VALUES ('claimSummary', 'systematicRegn');
-
+  
  
 
 -- Table: administrative.rrr_condition
-DROP TABLE administrative.lease_condition;
+DROP  TABLE  administrative.lease_condition  CASCADE;
 -- DROP TABLE administrative.rrr_condition;
 
 CREATE TABLE administrative.rrr_condition
@@ -37,7 +87,7 @@ Not Defined';
 
     -- Table: administrative.condition_for_rrr
 
-DROP TABLE administrative.lease_condition_for_rrr;
+DROP TABLE administrative.lease_condition_for_rrr CASCADE;
 --DROP TABLE administrative.condition_for_rrr;
 
 CREATE TABLE administrative.condition_for_rrr
